@@ -1,0 +1,63 @@
+Scénario de conflit Git sur index.html — Étapes 0 à 3
+=========================================================
+
+Contexte: dépôt 'Doliprane' contenant au moins README.md, index.html, Dockerfile.
+Hypothèse: index.html contient à l’origine ces lignes (ou équivalent):
+  <title>Doliprane</title>
+  <h1>Doliprane</h1>
+
+ETAPE 0) Préparation
+--------------------
+# Cloner le dépôt (ou aller dans le dossier s’il est déjà présent)
+git clone <URL-DE-TON-REPO>
+cd Doliprane
+
+# Se mettre à jour sur main
+git switch main
+git pull --rebase
+
+# (Optionnel) S’assurer que index.html a bien un <title> et un <h1> “Doliprane”
+# Si besoin, ajoute-les manuellement dans le fichier.
+
+ETAPE 1) Branche A — SEO (modifie <title> et <h1> d’une première manière)
+-------------------------------------------------------------------------
+git switch -c feature/seo
+
+# Modifier la même ligne visible par la suite, d’une première manière
+# (les deux commandes sed créent un backup .bak compatible macOS/GNU ; on le supprime ensuite)
+sed -i.bak 's#<title>Doliprane</title>#<title>Doliprane | Site officiel</title>#' index.html
+sed -i.bak 's#<h1>Doliprane</h1>#<h1>Doliprane – Site officiel</h1>#' index.html
+rm -f index.html.bak
+
+git add index.html
+git commit -m "feat(seo): titre & h1 optimisés (site officiel)"
+git push -u origin feature/seo
+
+ETAPE 2) Branche B — Design (modifie LES MÊMES LIGNES différemment)
+-------------------------------------------------------------------
+git switch main
+git switch -c feature/design
+
+# Modifier les mêmes lignes mais avec une autre version
+sed -i.bak 's#<title>Doliprane</title>#<title>Doliprane • v1</title>#' index.html
+sed -i.bak 's#<h1>Doliprane</h1>#<h1 class="title">Doliprane App</h1>#' index.html
+rm -f index.html.bak
+
+git add index.html
+git commit -m "feat(ui): nouveau h1 stylé + titre v1"
+git push -u origin feature/design
+
+ETAPE 3) Fusionner A puis B dans main → apparition du conflit
+-------------------------------------------------------------
+git switch main
+
+# 3.1 Fusion de la branche SEO (devrait passer sans conflit, fast-forward)
+git merge feature/seo
+git push
+
+# 3.2 Fusion de la branche Design (conflit attendu sur index.html)
+git merge feature/design
+
+# A ce stade, Git stoppe la fusion et marque index.html comme CONFLIT.
+# Le fichier contient des marqueurs <<<<<<<, =======, >>>>>>> montrant les deux versions.
+# (La résolution viendra à l’étape 4, en dehors du présent fichier.)
