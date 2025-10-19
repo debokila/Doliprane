@@ -4,7 +4,7 @@ git switch main
 git pull --rebase
 
 ajoute dans le fichier html
-<h1>Doliprane</h1>
+"<h1>"Doliprane"</h1>"
 
 
 Branche A — SEO (change le titre & le H1)
