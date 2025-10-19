@@ -1,5 +1,6 @@
 # assure-toi d'être à jour sur main
 git switch main
+
 git pull --rebase
 
 ajoute dans le fichier html
